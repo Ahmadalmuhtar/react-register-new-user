@@ -1,19 +1,30 @@
 import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import "./App.css";
 
 export default function App() {
 
-  const [newUser, setNewUser] = useState({ id: crypto.randomUUID(), firstName: '', lastName: '', email: '', phoneNumber: '' })
+  const [newUser, setNewUser] = useState({ id: uuidv4(), firstName: '', lastName: '', email: '', phoneNumber: '' })
   const [users, setUsers] = useState([])
+
+  const postData = () => {
+    axios.post("https://jsonplaceholder.typicode.com/users", newUser)
+      .then((response) => setNewUser(response.data))
+  }
+
+  useEffect(() => {
+    postData()
+  }, [])
 
   const handleAdd = (e) => {
     e.preventDefault();
     setUsers((currentUsers) => (
       [...currentUsers, newUser]
     ))
-    setNewUser({ firstName: '', lastName: '', email: '', phoneNumber: '' })
+    setNewUser({ id: uuidv4(), firstName: '', lastName: '', email: '', phoneNumber: '' })
   }
+
   return (
     <>
       <form onSubmit={handleAdd}>
@@ -31,7 +42,7 @@ export default function App() {
         </label>
         <label htmlFor="phoneField">
           phone number
-          <input type="text" id="phoneField" placeholder="Please enter your Phone number" value={newUser.phoneNumber} onChange={e => setNewUser((prevUser) => ({ ...prevUser, phoneNumber: e.target.value }))} />
+          <input type="tel" id="phoneField" placeholder="Please enter your Phone number" value={newUser.phoneNumber} onChange={e => setNewUser((prevUser) => ({ ...prevUser, phoneNumber: e.target.value }))} />
         </label>
         <button type="submit">Submit</button>
       </form>
@@ -42,6 +53,7 @@ export default function App() {
             <strong>- First Name:</strong> {user.firstName} <br />
             <strong>- Last Name:</strong> {user.lastName} <br />
             <strong>- Email:</strong> {user.email} <br />
+            <strong>- ID:</strong> {user.id} <br />
             <strong>- Phone Number:</strong> {user.phoneNumber} <br />
           </li>
         ))}
